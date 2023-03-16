@@ -18,7 +18,3 @@ see it in action [here](https://www.youtube.com/watch?v=KaGbA-CDJ1s)
 
 # credits
 the main visualizer was written by me, with help from nightradio, silent broadcast, and others. the other pixilang libraries were written by nightradio and are under the mit license. the placeholder assets were made by me
-
-## note
-
-`ffmpeg_video_export.pixi` was modified to record at a bitrate of 50000 to preserve quality, but you can change it to whatever you need, it's on line 24
