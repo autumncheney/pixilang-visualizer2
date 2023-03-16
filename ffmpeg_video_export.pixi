@@ -17,11 +17,11 @@ fn ffmpeg_video_export_thread( $thread_id, $ff )
     $vcodec = ""
     if $ff.kbits == 0
     {
-	sprintf( $vcodec, "-vcodec libx264 -b:v %uk -preset slow", $ff.kbits )
+	sprintf( $vcodec, "-vcodec libx264 -b:v 2000k -preset fast" )
     }
     else
     {
-	sprintf( $vcodec, "-vcodec libx264 -b:v 50000k -preset medium" )
+	sprintf( $vcodec, "-vcodec libx264 -b:v %uk -preset slow", $ff.kbits )
     }
     sprintf( 
 	$ts, 

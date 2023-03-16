@@ -27,6 +27,11 @@
     DEMO_STOP();
     DEMO_EMPTY();
 
+  Time functions:
+    0 - main, in milliseconds;
+    1 - set automatically, depending on the sound (pcm, sunvox, etc.);
+        in frames (pcm), lines (sunvox), or other sound units;
+
   Changelog:
   v1.0.1 (3 nov 2020):
   * bug fixes.
@@ -39,7 +44,7 @@
 
   This code is distributed under the MIT license:
 
-  Copyright (c) 2019 - 2020, Alexander Zolotov <nightradio@gmail.com>
+  Copyright (c) 2019 - 2022, Alexander Zolotov <nightradio@gmail.com>
   WarmPlace.ru
 
   Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -36,6 +36,9 @@ text_release = "song release title"
 // text distance scaling (0 - 1)
 text_scale = 0.25
 
+// text color
+text_color = #FFFFFF
+
 // -- SPECTRUM/VISUALIZER CONFIG --
 
 // goertzel size
@@ -109,6 +112,23 @@ cover_scale = 0.075
 // cover flash speed ( 0 - 1 )
 cover_flash_speed = 0.75
 
+// cover shake amplitude ( affects both amp and the zoom of the cover )
+cover_shake_amp = 3
+
+// cover shake speed ( the lower the value, the faster it is )
+cover_shake_speed = 1
+
+// -- BEGINNING FLASH CONFIG --
+
+// speed of the flash at the beginning in seconds
+beginning_flash_speed = 0.05
+
+// fade out of the flash at the beginning in seconds
+beginning_flash_fade = 2
+
+// exponential curve of the flash at the beginning ( >=0 )
+beginning_flash_curve = 5
+
 // - END CONFIG - 
 
 demo_load_wav( "media/song.wav" )
@@ -130,8 +150,8 @@ cover_src = clone(cover)
 logo_xsize = get_xsize(logo)
 logo_ysize = get_ysize(logo)
 
-corner_x = -demo_xsize / 2
-corner_y = -demo_ysize / 2
+corner_x = -demo_xsize div 2
+corner_y = -demo_ysize div 2
 
 logo_xsize = get_xsize(logo)
 logo_ysize = get_ysize(logo)
@@ -162,6 +182,7 @@ fn view( $t1, $t2, $len )
 	screen_blur( $t1 )
 
 	logos_render( $t1 )
+	beginning_flash_render( $t1 )
 	black( $t1 )
 	
 	transp( 255 )
@@ -170,6 +191,8 @@ fn view( $t1, $t2, $len )
 fn vis_render( $t1 )
 {
 
+    transp( 255 )
+    
 	if ( vis_linear ) {
 
 		if ( vis_int ) {
@@ -285,8 +308,8 @@ fn vis_render( $t1 )
 
 				amp_scaled = ( goertzel_values[ i ] / 500 ) * vis_scale
 
-				fbox( ( -demo_xsize / 2 ) + ( bar_space * i ), -amp_scaled, bar_space * vis_bar_width, amp_scaled, WHITE )
-				fbox( ( -demo_xsize / 2 ) + ( bar_space * i ), 0, bar_space * vis_bar_width, amp_scaled, WHITE )
+				fbox( ( -demo_xsize / 2 ) + ( bar_space * i ), -amp_scaled, bar_space * vis_bar_width, amp_scaled, vis_color )
+				fbox( ( -demo_xsize / 2 ) + ( bar_space * i ), 0, bar_space * vis_bar_width, amp_scaled, vis_color )
 
 				i = i + 1
 
@@ -413,8 +436,8 @@ fn vis_render( $t1 )
 
 				amp_scaled = ( goertzel_values[ i ] / 500 ) * vis_scale
 
-				fbox( ( -demo_xsize / 2 ) + ( bar_space * i ), -amp_scaled, bar_space * vis_bar_width, amp_scaled, WHITE )
-				fbox( ( -demo_xsize / 2 ) + ( bar_space * i ), 0, bar_space * vis_bar_width, amp_scaled, WHITE )
+				fbox( ( -demo_xsize / 2 ) + ( bar_space * i ), -amp_scaled, bar_space * vis_bar_width, amp_scaled, vis_color )
+				fbox( ( -demo_xsize / 2 ) + ( bar_space * i ), 0, bar_space * vis_bar_width, amp_scaled, vis_color )
 
 				i = i + 1
 
@@ -423,11 +446,15 @@ fn vis_render( $t1 )
 		}
 
 	}
+	
+	transp( 255 )
 
 }
 
 fn bg_render($t1) {
 
+    transp( 255 )
+    
 	base = 255 * cover_brightness
 
 	sample = ( abs( demo_sound_pcm_stream[ demo_sound_pcm_stream_ptr * demo_sound_channels ] ) + 0.5 )
@@ -438,23 +465,30 @@ fn bg_render($t1) {
 
 	flash = old_flash * ( 1 - cover_flash_speed ) + flash * cover_flash_speed
 
-	shake_x_func = sin( 0.6 * ( $t1 / 1000 ) ) + sin( 2.65 * ( $t1 / 1000 ) ) + sin( 3.7 * ( $t1 / 1000 ) ) * 3
-	shake_y_func = sin( 0.4 * ( $t1 / 1000 ) ) + sin( 1.45 * ( $t1 / 1000 ) ) + sin( 4.5 * ( $t1 / 1000 ) ) * 3
+	shake_x_func = sin( 0.6 * ( $t1 / ( 1000 * cover_shake_speed ) ) ) + sin( 2.65 * ( $t1 / ( 1000 * cover_shake_speed ) ) ) + sin( 3.7 * ( $t1 / ( 1000 * cover_shake_speed ) ) ) * cover_shake_amp
+	shake_y_func = sin( 0.4 * ( $t1 / ( 1000 * cover_shake_speed ) ) ) + sin( 1.45 * ( $t1 / ( 1000 * cover_shake_speed ) ) ) + sin( 4.5 * ( $t1 / ( 1000 * cover_shake_speed ) ) ) * cover_shake_amp
 
-	pixi(cover, shake_x_func , shake_y_func , get_color(flash, flash, flash), ((demo_xsize / cover_xsize)) * 1.1, ((demo_xsize / cover_xsize)) * 1.1)
+	pixi( cover, shake_x_func , shake_y_func , get_color( flash, flash, flash ), ( ( demo_xsize / cover_xsize ) ) * ( 1 + ( cover_shake_amp / 30 ) ) , ( ( demo_xsize / cover_xsize ) ) * ( 1 +  ( cover_shake_amp / 30 ) ) )
 
+    transp( 255 )
 }
 
 fn logos_render($t1) {
+
+    transp( 255 )
 
 	y_pos = smooth_staircase( ( ( $t1 / ( all_enter / 3 ) ) - 1 ), 1, 15, 1, -0.5 ) * ( all_enter / 3 )
 	
 	pixi(artist, 0, -y_pos, WHITE, logo_scale, logo_scale)
 	pixi(logo, 0, -y_pos + ( all_enter / 3 ), WHITE, logo_scale, logo_scale)
+	
+	transp( 255 )
 
 }
 
 fn logo_render($t1) {
+
+    transp( 255 )
 
 	rel_time = 1 - clip( max( $t1 - ( all_enter + 2000 ) , 0 ) / 1000 )
 
@@ -485,10 +519,14 @@ fn logo_render($t1) {
 		pixi( logo, x_pos , y_pos, WHITE, x_scale, y_scale, ( ( logo_ysize - logo_xsize ) / 2 ), 0, logo_xsize, logo_xsize )
 
 	}
+	
+    transp( 255 )
 
 }
 
 fn cover_render( $t1 ) {
+
+    transp( 255 )
 
 	rel_time = 1 - clip( max( $t1 - ( all_enter + 1000 ) , 0 ) / 1000 )
 
@@ -519,11 +557,15 @@ fn cover_render( $t1 ) {
 		pixi( cover_src, x_pos , y_pos, WHITE, x_scale, y_scale, ( ( cover_ysize - cover_xsize ) / 2 ), 0, cover_xsize, cover_xsize )
 
 	}
+	
+	transp( 255 )
 
 }
 
 fn black( $t1 ) {
 
+    transp( 255 )
+    
 	exit_point = demo_length - all_exit
    	rel_time = max($t1, exit_point) - exit_point
 	speed = 255 / (all_exit)
@@ -531,11 +573,15 @@ fn black( $t1 ) {
 	transp(255 - trans)
 
 	fbox(corner_x, corner_y, demo_xsize, demo_ysize, BLACK)
+	
+	transp( 255 )
 
 }
 
 fn text_render($t1) {
 
+    transp( 255 )
+    
 	rel_time = 1 - clip( max( $t1 - ( all_enter + 1000 ) , 0 ) / 1000 )
 
 	enter_func = ( pow( 50, rel_time ) - 1 ) / ( 50 - 1 )
@@ -551,9 +597,9 @@ fn text_render($t1) {
 		x_scale = cover_adjust_factor * cover_scale
 		y_scale = cover_adjust_factor * cover_scale
 
-		print( text_title, x_pos , y_pos - ( ( ( cover_ysize * cover_adjust_factor * cover_scale ) / 2 ) * text_scale )  , WHITE, TOP | RIGHT )
-		print( text_artist, x_pos , y_pos , WHITE, TOP | RIGHT )
-		print( text_release,  x_pos , y_pos + ( ( ( cover_ysize * cover_adjust_factor * cover_scale ) / 2 ) * text_scale ) , WHITE, TOP | RIGHT )
+		print( text_title, x_pos , y_pos - ( ( ( cover_ysize * cover_adjust_factor * cover_scale ) / 2 ) * text_scale )  , text_color , TOP | RIGHT )
+		print( text_artist, x_pos , y_pos , text_color , TOP | RIGHT )
+		print( text_release,  x_pos , y_pos + ( ( ( cover_ysize * cover_adjust_factor * cover_scale ) / 2 ) * text_scale ) , text_color , TOP | RIGHT )
 
 	} else {
 
@@ -564,11 +610,13 @@ fn text_render($t1) {
 		x_scale = cover_adjust_factor * cover_scale
 		y_scale = cover_adjust_factor * cover_scale
 
-		print( text_title, x_pos , y_pos - ( ( ( cover_ysize * cover_adjust_factor * cover_scale ) / 2 ) * text_scale )  , WHITE, TOP | RIGHT )
-		print( text_artist, x_pos , y_pos , WHITE, TOP | RIGHT )
-		print( text_release,  x_pos , y_pos + ( ( ( cover_ysize * cover_adjust_factor * cover_scale ) / 2 ) * text_scale ) , WHITE, TOP | RIGHT )
+		print( text_title, x_pos , y_pos - ( ( ( cover_ysize * cover_adjust_factor * cover_scale ) / 2 ) * text_scale )  , text_color , TOP | RIGHT )
+		print( text_artist, x_pos , y_pos , text_color , TOP | RIGHT )
+		print( text_release,  x_pos , y_pos + ( ( ( cover_ysize * cover_adjust_factor * cover_scale ) / 2 ) * text_scale ) , text_color , TOP | RIGHT )
 
 	}
+	    
+    transp( 255 )
 	
 
 }
@@ -604,9 +652,21 @@ fn screen_blur( $t1 ) {
 
 	}
 
-	
-
 }
+
+fn beginning_flash_render( $t1 ) {
+    
+    transp_time = max( 0 , $t1 - ( 1000 * beginning_flash_speed ) )
+    transp_value = 255 - ( 255 * ( transp_time / ( 1000 * beginning_flash_fade ) ) )
+    transp_value_curved = pow( transp_value / 255 , beginning_flash_curve ) * 255
+    transp( transp_value_curved )
+    
+    c = 255 * ( $t1 / ( 1000 * beginning_flash_speed ) )
+    fbox(corner_x, corner_y, demo_xsize, demo_ysize, get_color( c , c , c ))
+    
+    transp( 255 )
+}
+
 
 fn custom_init()
 {
