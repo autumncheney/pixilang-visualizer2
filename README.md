@@ -1,3 +1,5 @@
+# NOTICE: this github repository has been archived. the newest updates can be downloaded from [my gitea repo](https://git.acheney.xyz/acheney/pixilang-visualizer2)
+
 # abstract
 this is the second version of my pixilang visualizer, with a revamped look and config options! i kept the old one up because this one probably isn't as computationally efficient as the first one (it does look good if you bake it to a video though!)
 
